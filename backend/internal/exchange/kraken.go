@@ -69,9 +69,9 @@ func (k *Kraken) Connect(ctx context.Context, out chan<- PriceTick) {
 			pairs = append(pairs, v)
 		}
 	}
-	subscribe, _ := json.Marshal(map[string]interface{}{
+	subscribe, _ := json.Marshal(map[string]any{
 		"method": "subscribe",
-		"params": map[string]interface{}{
+		"params": map[string]any{
 			"channel": "ticker",
 			"symbol":  pairs,
 		},

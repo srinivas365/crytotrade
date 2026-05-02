@@ -73,7 +73,7 @@ func (c *Coinbase) Connect(ctx context.Context, out chan<- PriceTick) {
 	for k := range coinbaseSymbols {
 		products = append(products, k)
 	}
-	subscribe, _ := json.Marshal(map[string]interface{}{
+	subscribe, _ := json.Marshal(map[string]any{
 		"type":        "subscribe",
 		"product_ids": products,
 		"channel":     "ticker",
