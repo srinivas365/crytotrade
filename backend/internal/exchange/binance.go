@@ -46,8 +46,14 @@ func (b *Binance) parseMessage(raw []byte) (*PriceTick, error) {
 	if !ok {
 		return nil, nil
 	}
-	bid, _ := strconv.ParseFloat(msg.Data.Bid, 64)
-	ask, _ := strconv.ParseFloat(msg.Data.Ask, 64)
+	bid, err := strconv.ParseFloat(msg.Data.Bid, 64)
+	if err != nil || bid <= 0 {
+		return nil, nil
+	}
+	ask, err := strconv.ParseFloat(msg.Data.Ask, 64)
+	if err != nil || ask <= 0 {
+		return nil, nil
+	}
 	return &PriceTick{
 		Exchange:  "binance",
 		Symbol:    symbol,
@@ -88,6 +94,9 @@ func (b *Binance) Connect(ctx context.Context, out chan<- PriceTick) {
 				continue
 			}
 			select {
+			case <-ctx.Done():
+				conn.Close()
+				return
 			case out <- *tick:
 			default:
 			}

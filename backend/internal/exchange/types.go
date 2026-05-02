@@ -9,3 +9,6 @@ type PriceTick struct {
 	Ask       float64   `json:"ask"`
 	Timestamp time.Time `json:"timestamp"`
 }
+
+// TickHandler receives normalised ticks from a connector.
+type TickHandler func(PriceTick)

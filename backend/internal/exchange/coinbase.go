@@ -50,9 +50,12 @@ func (c *Coinbase) parseMessage(raw []byte) ([]PriceTick, error) {
 			if !ok {
 				continue
 			}
-			bid, _ := strconv.ParseFloat(t.BestBid, 64)
-			ask, _ := strconv.ParseFloat(t.BestAsk, 64)
-			if bid == 0 && ask == 0 {
+			bid, err := strconv.ParseFloat(t.BestBid, 64)
+			if err != nil || bid <= 0 {
+				continue
+			}
+			ask, err := strconv.ParseFloat(t.BestAsk, 64)
+			if err != nil || ask <= 0 {
 				continue
 			}
 			ticks = append(ticks, PriceTick{
@@ -91,7 +94,11 @@ func (c *Coinbase) Connect(ctx context.Context, out chan<- PriceTick) {
 			time.Sleep(5 * time.Second)
 			continue
 		}
-		conn.WriteMessage(websocket.TextMessage, subscribe)
+		if err := conn.WriteMessage(websocket.TextMessage, subscribe); err != nil {
+			log.Printf("coinbase subscribe: %v", err)
+			conn.Close()
+			continue
+		}
 		for {
 			_, msg, err := conn.ReadMessage()
 			if err != nil {
@@ -105,6 +112,9 @@ func (c *Coinbase) Connect(ctx context.Context, out chan<- PriceTick) {
 			}
 			for _, tick := range ticks {
 				select {
+				case <-ctx.Done():
+					conn.Close()
+					return
 				case out <- tick:
 				default:
 				}

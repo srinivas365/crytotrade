@@ -21,6 +21,18 @@ var krakenSymbols = map[string]string{
 	"DOT/USDT":  "DOT/USDT",
 }
 
+var krakenPairs = func() []string {
+	seen := map[string]bool{}
+	var pairs []string
+	for _, v := range krakenSymbols {
+		if !seen[v] {
+			seen[v] = true
+			pairs = append(pairs, v)
+		}
+	}
+	return pairs
+}()
+
 type Kraken struct{}
 
 type krakenMsg struct {
@@ -60,20 +72,11 @@ func (k *Kraken) parseMessage(raw []byte) ([]PriceTick, error) {
 
 func (k *Kraken) Connect(ctx context.Context, out chan<- PriceTick) {
 	url := "wss://ws.kraken.com/v2"
-	// deduplicate normalised symbols for subscribe list
-	seen := map[string]bool{}
-	var pairs []string
-	for _, v := range krakenSymbols {
-		if !seen[v] {
-			seen[v] = true
-			pairs = append(pairs, v)
-		}
-	}
 	subscribe, _ := json.Marshal(map[string]any{
 		"method": "subscribe",
 		"params": map[string]any{
 			"channel": "ticker",
-			"symbol":  pairs,
+			"symbol":  krakenPairs,
 		},
 	})
 
@@ -89,7 +92,11 @@ func (k *Kraken) Connect(ctx context.Context, out chan<- PriceTick) {
 			time.Sleep(5 * time.Second)
 			continue
 		}
-		conn.WriteMessage(websocket.TextMessage, subscribe)
+		if err := conn.WriteMessage(websocket.TextMessage, subscribe); err != nil {
+			log.Printf("kraken subscribe: %v", err)
+			conn.Close()
+			continue
+		}
 		for {
 			_, msg, err := conn.ReadMessage()
 			if err != nil {
@@ -103,6 +110,9 @@ func (k *Kraken) Connect(ctx context.Context, out chan<- PriceTick) {
 			}
 			for _, tick := range ticks {
 				select {
+				case <-ctx.Done():
+					conn.Close()
+					return
 				case out <- tick:
 				default:
 				}
