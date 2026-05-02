@@ -59,7 +59,7 @@ func Migrate(ctx context.Context, pool *pgxpool.Pool, dir string) error {
 		}
 		tx, err := pool.Begin(ctx)
 		if err != nil {
-			return err
+			return fmt.Errorf("begin tx for %s: %w", name, err)
 		}
 		if _, err := tx.Exec(ctx, string(content)); err != nil {
 			tx.Rollback(ctx)
@@ -67,10 +67,10 @@ func Migrate(ctx context.Context, pool *pgxpool.Pool, dir string) error {
 		}
 		if _, err := tx.Exec(ctx, `INSERT INTO schema_migrations(filename) VALUES($1)`, name); err != nil {
 			tx.Rollback(ctx)
-			return err
+			return fmt.Errorf("record migration %s: %w", name, err)
 		}
 		if err := tx.Commit(ctx); err != nil {
-			return err
+			return fmt.Errorf("commit %s: %w", name, err)
 		}
 	}
 	return nil

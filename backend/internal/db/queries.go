@@ -9,10 +9,10 @@ import (
 )
 
 type User struct {
-	ID           string
-	Email        string
-	PasswordHash string
-	CreatedAt    time.Time
+	ID           string    `json:"id"`
+	Email        string    `json:"email"`
+	PasswordHash string    `json:"password_hash"`
+	CreatedAt    time.Time `json:"created_at"`
 }
 
 type UserSettings struct {
@@ -50,7 +50,7 @@ func (q *Queries) CreateUser(ctx context.Context, email, hash string) (*User, er
 		return nil, fmt.Errorf("create user: %w", err)
 	}
 	if _, err := q.pool.Exec(ctx,
-		`INSERT INTO user_settings(user_id) VALUES($1) ON CONFLICT DO NOTHING`, u.ID,
+		`INSERT INTO user_settings(user_id) VALUES($1) ON CONFLICT(user_id) DO NOTHING`, u.ID,
 	); err != nil {
 		return nil, fmt.Errorf("create settings: %w", err)
 	}
@@ -73,7 +73,7 @@ func (q *Queries) GetSettings(ctx context.Context, userID string) (*UserSettings
 		`SELECT user_id,threshold_pct,telegram_bot_token,telegram_chat_id,in_app_alerts,alert_sound
 		 FROM user_settings WHERE user_id=$1`, userID,
 	).Scan(&s.UserID, &s.ThresholdPct, &s.TelegramBotToken, &s.TelegramChatID, &s.InAppAlerts, &s.AlertSound); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get settings for user %s: %w", userID, err)
 	}
 	return s, nil
 }
@@ -97,7 +97,7 @@ func (q *Queries) GetAllSettings(ctx context.Context) ([]*UserSettings, error) {
 	rows, err := q.pool.Query(ctx,
 		`SELECT user_id,threshold_pct,telegram_bot_token,telegram_chat_id,in_app_alerts,alert_sound FROM user_settings`)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get all settings: %w", err)
 	}
 	defer rows.Close()
 	var out []*UserSettings
@@ -127,7 +127,7 @@ func (q *Queries) GetAlertHistory(ctx context.Context, userID string, limit int)
 		userID, limit,
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get alert history for user %s: %w", userID, err)
 	}
 	defer rows.Close()
 	var out []*AlertRecord
