@@ -1,32 +1,59 @@
 <template>
   <div class="min-h-screen bg-gray-50 p-4 sm:p-6">
     <h2 class="text-xl font-bold text-gray-900 mb-5">Alert History</h2>
-    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm min-w-[480px]">
-          <thead class="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th class="text-left px-3 sm:px-4 py-3 font-semibold text-gray-600">Time</th>
-              <th class="text-left px-3 sm:px-4 py-3 font-semibold text-gray-600">Pair</th>
-              <th class="text-left px-3 sm:px-4 py-3 font-semibold text-gray-600">Buy</th>
-              <th class="text-left px-3 sm:px-4 py-3 font-semibold text-gray-600">Sell</th>
-              <th class="text-right px-3 sm:px-4 py-3 font-semibold text-gray-600">Spread %</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-if="!records.length">
-              <td colspan="5" class="text-center py-12 text-gray-400">No alerts yet.</td>
-            </tr>
-            <tr v-for="r in records" :key="r.id" class="border-t border-gray-100 hover:bg-gray-50">
-              <td class="px-3 sm:px-4 py-3 text-gray-500">{{ fmtDate(r.fired_at) }}</td>
-              <td class="px-3 sm:px-4 py-3 font-medium text-gray-900">{{ r.symbol }}</td>
-              <td class="px-3 sm:px-4 py-3 capitalize text-gray-700">{{ r.buy_exchange }} ${{ r.buy_price.toFixed(4) }}</td>
-              <td class="px-3 sm:px-4 py-3 capitalize text-gray-700">{{ r.sell_exchange }} ${{ r.sell_price.toFixed(4) }}</td>
-              <td class="px-3 sm:px-4 py-3 text-right font-bold text-green-600">+{{ r.spread_pct.toFixed(4) }}%</td>
-            </tr>
-          </tbody>
-        </table>
+
+    <!-- Mobile: card layout -->
+    <div class="block sm:hidden space-y-3">
+      <div v-if="!records.length" class="bg-white border border-gray-200 rounded-xl p-6 text-center text-gray-400 text-sm">
+        No alerts yet.
       </div>
+      <div
+        v-for="r in records" :key="r.id"
+        class="bg-white border border-gray-200 rounded-xl p-4"
+      >
+        <div class="flex items-center justify-between mb-3">
+          <span class="font-bold text-gray-900 text-base">{{ r.symbol }}</span>
+          <span class="text-sm font-bold text-green-600">+{{ r.spread_pct.toFixed(4) }}%</span>
+        </div>
+        <div class="space-y-1.5 text-sm">
+          <div class="flex justify-between">
+            <span class="text-gray-500">Buy on <span class="capitalize font-medium text-gray-700">{{ r.buy_exchange }}</span></span>
+            <span class="text-gray-800 font-mono">${{ r.buy_price.toFixed(4) }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-gray-500">Sell on <span class="capitalize font-medium text-gray-700">{{ r.sell_exchange }}</span></span>
+            <span class="text-gray-800 font-mono">${{ r.sell_price.toFixed(4) }}</span>
+          </div>
+          <div class="pt-1 text-xs text-gray-400">{{ fmtDate(r.fired_at) }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Desktop: table layout -->
+    <div class="hidden sm:block bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <table class="w-full text-sm">
+        <thead class="bg-gray-50 border-b border-gray-200">
+          <tr>
+            <th class="text-left px-4 py-3 font-semibold text-gray-600">Time</th>
+            <th class="text-left px-4 py-3 font-semibold text-gray-600">Pair</th>
+            <th class="text-left px-4 py-3 font-semibold text-gray-600">Buy</th>
+            <th class="text-left px-4 py-3 font-semibold text-gray-600">Sell</th>
+            <th class="text-right px-4 py-3 font-semibold text-gray-600">Spread %</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-if="!records.length">
+            <td colspan="5" class="text-center py-12 text-gray-400">No alerts yet.</td>
+          </tr>
+          <tr v-for="r in records" :key="r.id" class="border-t border-gray-100 hover:bg-gray-50">
+            <td class="px-4 py-3 text-gray-500">{{ fmtDate(r.fired_at) }}</td>
+            <td class="px-4 py-3 font-medium text-gray-900">{{ r.symbol }}</td>
+            <td class="px-4 py-3 capitalize text-gray-700">{{ r.buy_exchange }} ${{ r.buy_price.toFixed(4) }}</td>
+            <td class="px-4 py-3 capitalize text-gray-700">{{ r.sell_exchange }} ${{ r.sell_price.toFixed(4) }}</td>
+            <td class="px-4 py-3 text-right font-bold text-green-600">+{{ r.spread_pct.toFixed(4) }}%</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <div v-if="totalPages > 1" class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mt-4">
