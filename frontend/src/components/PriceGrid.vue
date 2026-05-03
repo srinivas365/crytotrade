@@ -1,26 +1,67 @@
 <template>
-  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-    <div class="overflow-x-auto">
-      <table class="w-full text-sm min-w-[520px]">
+  <div>
+    <!-- Mobile: card layout (hidden on sm+) -->
+    <div class="block sm:hidden">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xs text-gray-500">{{ rows.length }} pairs</span>
+        <button
+          @click="$emit('sort')"
+          class="text-xs font-medium text-indigo-600 border border-indigo-200 rounded-lg px-3 py-1"
+        >Sort by Spread ↕</button>
+      </div>
+      <div class="space-y-3">
+        <div
+          v-for="row in rows" :key="row.symbol"
+          class="bg-white border border-gray-200 rounded-xl p-4"
+        >
+          <div class="flex items-center justify-between mb-3">
+            <span class="font-bold text-gray-900 text-base">{{ row.symbol }}</span>
+            <span
+              class="text-sm font-bold"
+              :class="row.bestSpread > 0 ? 'text-green-600' : 'text-gray-400'"
+            >{{ row.bestSpread > 0 ? '+' + row.bestSpread.toFixed(4) + '%' : '—' }}</span>
+          </div>
+          <div class="space-y-1.5 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-500 w-20">Binance</span>
+              <span class="text-gray-800 font-mono">{{ fmt(row.binance) }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500 w-20">Coinbase</span>
+              <span class="text-gray-800 font-mono">{{ fmt(row.coinbase) }}</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-500 w-20">Kraken</span>
+              <span class="text-gray-800 font-mono">{{ fmt(row.kraken) }}</span>
+            </div>
+          </div>
+        </div>
+        <p v-if="rows.length === 0" class="text-center py-8 text-gray-400 text-sm">No price data yet.</p>
+      </div>
+    </div>
+
+    <!-- Desktop: table layout (hidden on mobile) -->
+    <div class="hidden sm:block bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <table class="w-full text-sm">
         <thead class="bg-gray-50 border-b border-gray-200">
           <tr>
-            <th class="text-left px-3 sm:px-4 py-3 font-semibold text-gray-600">Pair</th>
-            <th class="text-left px-3 sm:px-4 py-3 font-semibold text-gray-600">Binance</th>
-            <th class="text-left px-3 sm:px-4 py-3 font-semibold text-gray-600">Coinbase</th>
-            <th class="text-left px-3 sm:px-4 py-3 font-semibold text-gray-600">Kraken</th>
+            <th class="text-left px-4 py-3 font-semibold text-gray-600">Pair</th>
+            <th class="text-left px-4 py-3 font-semibold text-gray-600">Binance</th>
+            <th class="text-left px-4 py-3 font-semibold text-gray-600">Coinbase</th>
+            <th class="text-left px-4 py-3 font-semibold text-gray-600">Kraken</th>
             <th
-              class="text-right px-3 sm:px-4 py-3 font-semibold text-gray-600 cursor-pointer select-none"
+              class="text-right px-4 py-3 font-semibold text-gray-600 cursor-pointer select-none"
               @click="$emit('sort')"
             >Best Spread % ↕</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="row in rows" :key="row.symbol" class="border-t border-gray-100 hover:bg-gray-50">
-            <td class="px-3 sm:px-4 py-3 font-medium text-gray-900">{{ row.symbol }}</td>
-            <td class="px-3 sm:px-4 py-3 text-gray-700">{{ fmt(row.binance) }}</td>
-            <td class="px-3 sm:px-4 py-3 text-gray-700">{{ fmt(row.coinbase) }}</td>
-            <td class="px-3 sm:px-4 py-3 text-gray-700">{{ fmt(row.kraken) }}</td>
-            <td class="px-3 sm:px-4 py-3 text-right font-medium" :class="row.bestSpread > 0 ? 'text-green-600' : 'text-gray-400'">
+            <td class="px-4 py-3 font-medium text-gray-900">{{ row.symbol }}</td>
+            <td class="px-4 py-3 text-gray-700">{{ fmt(row.binance) }}</td>
+            <td class="px-4 py-3 text-gray-700">{{ fmt(row.coinbase) }}</td>
+            <td class="px-4 py-3 text-gray-700">{{ fmt(row.kraken) }}</td>
+            <td class="px-4 py-3 text-right font-medium" :class="row.bestSpread > 0 ? 'text-green-600' : 'text-gray-400'">
               {{ row.bestSpread > 0 ? '+' + row.bestSpread.toFixed(4) + '%' : '—' }}
             </td>
           </tr>
