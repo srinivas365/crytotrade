@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex items-center justify-center">
-    <div class="bg-white rounded-xl shadow p-8 w-full max-w-sm">
+  <div class="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+    <div class="bg-white rounded-xl shadow p-6 sm:p-8 w-full max-w-sm">
       <h1 class="text-2xl font-bold text-gray-900 mb-6 text-center">CryptoTrade</h1>
 
       <div class="flex rounded-lg border border-gray-200 mb-6">

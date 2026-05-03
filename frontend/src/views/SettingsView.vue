@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gray-50 p-6">
+  <div class="min-h-screen bg-gray-50 p-4 sm:p-6">
     <h2 class="text-xl font-bold text-gray-900 mb-5">Settings</h2>
-    <div class="bg-white rounded-xl border border-gray-200 p-6 max-w-lg">
+    <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-6 w-full sm:max-w-lg">
       <form @submit.prevent="save" class="space-y-5">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Alert Threshold (%)</label>

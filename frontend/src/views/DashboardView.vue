@@ -1,8 +1,8 @@
 <template>
-  <div class="min-h-screen bg-gray-50 p-6">
+  <div class="min-h-screen bg-gray-50 p-4 sm:p-6">
     <h2 class="text-xl font-bold text-gray-900 mb-5">Dashboard</h2>
 
-    <div class="grid grid-cols-3 gap-4 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
       <StatCard
         label="Active Opportunities"
         :value="opportunities.length"
