@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth.js'
 
 const auth = useAuthStore()
@@ -63,8 +63,13 @@ const form = ref({
   alert_sound: true,
 })
 
-onMounted(() => {
+onMounted(async () => {
+  if (!auth.settings) await auth.fetchSettings()
   if (auth.settings) Object.assign(form.value, auth.settings)
+})
+
+watch(() => auth.settings, (s) => {
+  if (s) Object.assign(form.value, s)
 })
 
 async function save() {
