@@ -120,11 +120,19 @@ func (q *Queries) InsertAlert(ctx context.Context, r *AlertRecord) error {
 	return err
 }
 
-func (q *Queries) GetAlertHistory(ctx context.Context, userID string, limit int) ([]*AlertRecord, error) {
+func (q *Queries) CountAlertHistory(ctx context.Context, userID string) (int, error) {
+	var n int
+	err := q.pool.QueryRow(ctx,
+		`SELECT COUNT(*) FROM alert_history WHERE user_id=$1`, userID,
+	).Scan(&n)
+	return n, err
+}
+
+func (q *Queries) GetAlertHistory(ctx context.Context, userID string, limit, offset int) ([]*AlertRecord, error) {
 	rows, err := q.pool.Query(ctx,
 		`SELECT id,user_id,symbol,buy_exchange,sell_exchange,spread_pct,buy_price,sell_price,fired_at
-		 FROM alert_history WHERE user_id=$1 ORDER BY fired_at DESC LIMIT $2`,
-		userID, limit,
+		 FROM alert_history WHERE user_id=$1 ORDER BY fired_at DESC LIMIT $2 OFFSET $3`,
+		userID, limit, offset,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("get alert history for user %s: %w", userID, err)

@@ -10,7 +10,7 @@ type Config struct {
 
 func Load() Config {
 	return Config{
-		DatabaseURL: env("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/cryptotrade?sslmode=disable"),
+		DatabaseURL: env("DATABASE_URL", "postgres://postgres:loveudad@localhost:5432/cryptotrade?sslmode=disable"),
 		JWTSecret:   env("JWT_SECRET", "change-me-in-production"),
 		Port:        env("PORT", "8080"),
 	}
