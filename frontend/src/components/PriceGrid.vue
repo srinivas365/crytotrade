@@ -80,6 +80,7 @@ const EXCHANGES = [
   { id: 'coinbase', label: 'Coinbase' },
   { id: 'kraken',   label: 'Kraken' },
   { id: 'coindcx',       label: 'CoinDCX' },
+  { id: 'coinswitch',    label: 'CoinSwitch' },
   { id: 'indep_reserve', label: 'Indep Reserve' },
 ]
 
