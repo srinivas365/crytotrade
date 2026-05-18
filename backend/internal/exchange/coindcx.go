@@ -3,6 +3,7 @@ package exchange
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -109,6 +110,21 @@ func (c *CoinDCX) fetchOnce(ctx context.Context, client *http.Client) ([]PriceTi
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
+	}
+	if resp.StatusCode != http.StatusOK {
+		snippet := strings.TrimSpace(string(body))
+		if len(snippet) > 160 {
+			snippet = snippet[:160] + "…"
+		}
+		return nil, fmt.Errorf("http %s: %s", resp.Status, snippet)
+	}
+	s := strings.TrimSpace(string(body))
+	if len(s) > 0 && s[0] == '<' {
+		prefix := s
+		if len(prefix) > 80 {
+			prefix = prefix[:80] + "…"
+		}
+		return nil, fmt.Errorf("response is HTML not JSON (proxy/WAF/captive portal?); prefix: %q", prefix)
 	}
 	return c.parseTickers(body)
 }
