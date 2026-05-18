@@ -44,7 +44,6 @@ func main() {
 	go (&exchange.Binance{}).Connect(ctx, tickCh)
 	go (&exchange.Coinbase{}).Connect(ctx, tickCh)
 	go (&exchange.Kraken{}).Connect(ctx, tickCh)
-	go (&exchange.CoinDCX{}).Connect(ctx, tickCh)
 	go (&exchange.CoinSwitch{}).Connect(ctx, tickCh)
 	go (&exchange.IndepReserve{}).Connect(ctx, tickCh)
 
