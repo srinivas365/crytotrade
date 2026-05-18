@@ -12,6 +12,7 @@ flowchart TB
     BN[Binance WebSocket]
     CB[Coinbase WebSocket]
     KR[Kraken WebSocket]
+    CDX[CoinDCX REST]
     CSW[CoinSwitch REST]
     IR[Independent Reserve REST]
     PG[(PostgreSQL)]
@@ -36,6 +37,7 @@ flowchart TB
   BN --> EX
   CB --> EX
   KR --> EX
+  CDX --> EX
   CSW --> EX
   IR --> EX
   EX --> AGG
@@ -55,9 +57,9 @@ flowchart TB
 
 ## Exchange transports
 
-Binance, Coinbase, and Kraken stream live book-ticker frames over public WebSocket. CoinSwitch and Independent Reserve do not expose a usable public WebSocket for this dataset, so their connectors poll REST endpoints (CoinSwitch: bulk `/trade/api/v2/24hr/all-pairs/ticker?exchange=coinswitchx` every 3s; Independent Reserve: per-pair `GetMarketSummary` every 5s, fan-out one goroutine per pair) and emit normalized `PriceTick`s onto the same channel. The aggregator and downstream packages are transport-agnostic.
+Binance, Coinbase, and Kraken stream live book-ticker frames over public WebSocket. CoinDCX, CoinSwitch, and Independent Reserve do not expose a usable public WebSocket for this dataset, so their connectors poll REST endpoints (CoinDCX: bulk `/exchange/ticker` every 3s; CoinSwitch: bulk `/trade/api/v2/24hr/all-pairs/ticker?exchange=coinswitchx` every 3s; Independent Reserve: per-pair `GetMarketSummary` every 5s, fan-out one goroutine per pair) and emit normalized `PriceTick`s onto the same channel. The aggregator and downstream packages are transport-agnostic.
 
-CoinSwitch contributes INR pairs; Independent Reserve contributes SGD pairs. Quote currency is encoded in the symbol (e.g. `BTC/USDT`, `BTC/INR`, `BTC/SGD`), so spread comparison naturally stays within a single quote currency.
+CoinDCX contributes USDT and INR pairs; CoinSwitch contributes INR pairs; Independent Reserve contributes SGD pairs. Quote currency is encoded in the symbol (e.g. `BTC/USDT`, `BTC/INR`, `BTC/SGD`), so spread comparison naturally stays within a single quote currency.
 
 ---
 
@@ -70,6 +72,7 @@ flowchart LR
     B[Binance]
     C[Coinbase]
     K[Kraken]
+    D[CoinDCX]
     CS[CoinSwitch]
     IRX[IndepReserve]
   end
